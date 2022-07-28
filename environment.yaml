@@ -1,0 +1,16 @@
+name: rna-clock
+channels:
+  - conda-forge
+  - BjornFJohansson
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - jupyterlab
+  - scanpy
+  - click
+  - pip
+  - pip:
+      - pycomfort
+      - polars
+      - lassonet
