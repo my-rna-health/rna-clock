@@ -65,8 +65,22 @@ def download_gtex_tpms(skip_if_exist: bool = True):
             fp.seek(0)
             fp.truncate()
             fp.writelines(lines[2:])
-            print("trancating the bulk RNA-Seq file")
+            print("transposing the bulk RNA-Seq file")
+    transpose_gtex_bulk(rna_name, skip_if_exist)
 
+
+def transpose_gtex_bulk(rna_name: str, skip_if_exist: bool = True):
+    import pandas as pd
+    exp_name = rna_name.replace(".gct", "expressions.tsv")
+    exp_path = gtex / exp_name
+    if skip_if_exist and exp_path.exists():
+        print("skipping transposing")
+    else:
+        print("transposing gtex bulk rna-seq")
+        df = pd.read_csv(gtex / rna_name, sep="\t")
+        exp: pd.DataFrame = df.transpose()
+        exp.to_csv(exp_path, sep="\t", header=True)
+        print(f"transposing finished and saved to {exp_path}")
 
 def download_gtex_sample(skip_if_exist: bool = True):
     print("downloading gtex samples info")
@@ -87,6 +101,7 @@ def download_gtex():
     print("downloading gtex files")
     download_gtex_single_cell()
     download_gtex_bulk()
+
 
 
 @app.command()
