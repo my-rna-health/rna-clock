@@ -9,6 +9,10 @@ dependencies:
   - jupyterlab
   - scanpy
   - click
+  - lightgbm
+  - plotly
+  - jupyter-dash
+  - pyarrow
   - pip
   - pip:
       - pycomfort
