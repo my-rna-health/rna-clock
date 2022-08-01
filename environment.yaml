@@ -11,8 +11,8 @@ dependencies:
   - click
   - lightgbm
   - plotly
-  - jupyter-dash
   - pyarrow
+  - datamash>=1.8
   - pip
   - pip:
       - pycomfort

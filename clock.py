@@ -71,16 +71,22 @@ def download_gtex_tpms(skip_if_exist: bool = True):
 
 def transpose_gtex_bulk(rna_name: str, skip_if_exist: bool = True):
     import pandas as pd
-    exp_name = rna_name.replace(".gct", "expressions.tsv")
+    gct = str(gtex / rna_name)
+    exp_name = rna_name.replace(".gct", "_expressions.tsv")
     exp_path = gtex / exp_name
     if skip_if_exist and exp_path.exists():
         print("skipping transposing")
     else:
         print("transposing gtex bulk rna-seq")
-        df = pd.read_csv(gtex / rna_name, sep="\t")
-        exp: pd.DataFrame = df.transpose()
-        exp.to_csv(exp_path, sep="\t", header=True)
-        print(f"transposing finished and saved to {exp_path}")
+        import subprocess
+        comm = f"datamash transpose < {gct} > {str(exp_path)}"
+        print(f"command to run: {comm}")
+        transpose = subprocess.run(comm, shell=True)
+        print("The exit code was: %d" % transpose.returncode)
+        #df = pd.read_csv(gtex / rna_name, sep="\t")
+        #exp: pd.DataFrame = df.transpose()
+        #exp.to_csv(exp_path, sep="\t", header=True)
+        #print(f"transposing finished and saved to {exp_path}")
 
 def download_gtex_sample(skip_if_exist: bool = True):
     print("downloading gtex samples info")
