@@ -2,6 +2,7 @@ GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad
 GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad
 GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct.gz
 GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct
+GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.stable.gct
 GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt
 GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt
-GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_expressions.tsv
+GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable_expressions.tsv
