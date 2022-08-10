@@ -13,6 +13,8 @@ dependencies:
   - plotly
   - pyarrow
   - datamash>=1.8
+  - dvc
+  - dvc-gdrive
   - pip
   - pip:
       - pycomfort

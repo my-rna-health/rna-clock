@@ -1,0 +1,16 @@
+stages:
+  download:
+    cmd: python clock.py download
+    outs:
+      - data/gtex/input/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad
+      - data/gtex/input/GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad
+      - data/gtex/interim/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable_expressions.tsv
+      - data/gtex/interim/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable.gct
+  prepare_bulk:
+    deps:
+      - data/gtex/input/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt
+      - data/gtex/input/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt
+    cmd: python gtex.py prepare-bulk
+    outs:
+      - data/gtex/interim/samples_with_subjects.parquet
+      - data/gtex/interim/expressions_extended.parquet
