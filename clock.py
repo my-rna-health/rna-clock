@@ -25,5 +25,3 @@ def train_light_gbm(self, X_train, X_test, y_train, y_test,
                     callbacks=[stopping_callback]
                     )
     return gbm, BasicMetrics.parse_eval(evals_result)
-
-def validate_lightgbm()

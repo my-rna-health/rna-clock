@@ -128,9 +128,9 @@ def download_gtex():
 def download():
     download_gtex()
 
-def with_subjects(exp: pl.DataFrame):
-    pl.col("my").str.split(",").arr.
-    pl.col("my_column").where()
+#def with_subjects(exp: pl.DataFrame):
+#    pl.col("my").str.split(",").arr.
+#    pl.col("my_column").where()
 
 def with_subjects(exp: pl.DataFrame):
     samples_with_subjects_path = gtex_interim / "samples_with_subjects.parquet"
