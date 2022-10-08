@@ -15,6 +15,7 @@ dependencies:
   - datamash>=1.8
   - dvc
   - dvc-gdrive
+  - shap
   - pip
   - pip:
       - pycomfort

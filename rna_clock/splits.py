@@ -13,7 +13,7 @@ def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age") -> tuple[nu
 def with_folds(df: pl.DataFrame, folds: int):
     count = pl.lit(df.shape[0])
     per_fold = count / folds
-    return df.with_row_count("num").with_column( (pl.col("num") / count).alias("acc")) \
+    return df.with_row_count("num").with_column((pl.col("num") / count).alias("acc")) \
         .with_column((pl.col("num") / per_fold + 1).cast(pl.Int32).alias("fold")).drop("num")
 
 
@@ -24,7 +24,7 @@ def with_train_test(df: pl.DataFrame, train: float = 0.8):
     return df.with_row_count("num").with_column(fold)
 
 
-def with_train_test_split(df: pl.DataFrame, train: float = 0.8, as_dict: bool = False)-> list[pl.DataFrame] | dict[Any, pl.DataFrame]:
+def with_train_test_split(df: pl.DataFrame, train: float = 0.8, as_dict: bool = False) -> list[pl.DataFrame] | dict[Any, pl.DataFrame]:
     return with_train_test(df, train).drop("num").partition_by("fold", as_dict=as_dict)
 
 
