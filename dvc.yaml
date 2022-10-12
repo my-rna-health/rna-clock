@@ -1,4 +1,14 @@
 stages:
+  train_gtex:
+    cmd: python gtex.py train
+    deps:
+      - data/gtex/interim/expressions_extended.parquet
+    metrics:
+      - data/gtex/output/all/gtex_metrics_best_huber.json
+      - data/gtex/output/all/gtex_metrics_best_mse.json
+    plots:
+      - data/gtex/output/all/gtex_metrics_plot.json
+      - data/gtex/output/all/gtex_metrics_best_huber.json
   download:
     cmd: python clock.py download
     outs:

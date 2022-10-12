@@ -10,6 +10,10 @@ def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age") -> tuple[nu
     return expressions.select(gene_columns).to_numpy(), expressions.select(to_predict).to_numpy()
 
 
+def to_XY_columned(expressions: pl.DataFrame, columns: list[str], to_predict: str = "medium_age") -> tuple[numpy.ndarray, numpy.ndarray]:
+    return expressions.select(columns).to_numpy(), expressions.select(to_predict).to_numpy()
+
+
 def with_folds(df: pl.DataFrame, folds: int):
     count = pl.lit(df.shape[0])
     per_fold = count / folds

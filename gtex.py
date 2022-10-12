@@ -6,20 +6,16 @@ import click
 import polars as pl
 from pycomfort.files import *
 
-data = Path("data")
-gtex = data / "gtex"
-gtex.mkdir(parents=True, exist_ok=True)
+from rna_clock.train import train_gtex
+from rna_clock.config import Locations
 
-gtex_input = gtex / "input"
-gtex_input.mkdir(parents=True, exist_ok=True)
-
-gtex_interim = gtex / "interim"
-gtex_interim.mkdir(parents=True, exist_ok=True)
+locations = Locations(Path("."))
 
 proxy_handler = urllib.request.ProxyHandler({})
 opener = urllib.request.build_opener(proxy_handler)
 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 urllib.request.install_opener(opener)
+
 
 @click.group()
 def app():
@@ -42,13 +38,13 @@ def clean():
 def download_gtex_single_cell(skit_if_exist: bool = True):
     print("downloading single cell")
     url = "https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad"
-    output_file = gtex_input / "GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad"
+    output_file = locations.gtex_input / "GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad"
     if skit_if_exist and output_file.exists():
         print("scRNA-Seq file exists, skipping downloading it")
     else:
         urllib.request.urlretrieve(url, output_file)
     immune_url = "https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad"
-    immune_file = gtex_input / "GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad"
+    immune_file = locations.gtex_input / "GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad"
     if skit_if_exist and immune_file.exists():
         print("skipping immune downloads")
     else:
@@ -67,9 +63,9 @@ def stabilize_rna(path: Path) -> pl.DataFrame:
 def download_gtex_tpms(skip_if_exist: bool = True):
     url = "https://storage.googleapis.com/gtex_analysis_v8/rna_seq_data/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct.gz"
     rna_name = "GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct"
-    stable_rna_file = gtex_input / rna_name.replace("_tpm", "_tpm_stable")
-    rna_file_gz = gtex_input / (rna_name + ".gz")
-    rna_file = gtex_input / rna_name
+    stable_rna_file = locations.gtex_input / rna_name.replace("_tpm", "_tpm_stable")
+    rna_file_gz = locations.gtex_input / (rna_name + ".gz")
+    rna_file = locations.gtex_input / rna_name
     if skip_if_exist and stable_rna_file.exists():
         print("file exists, skipping")
     else:
@@ -89,9 +85,9 @@ def download_gtex_tpms(skip_if_exist: bool = True):
 
 
 def transpose_gtex_bulk(rna_name: str, skip_if_exist: bool = True):
-    gct = str(gtex_interim / rna_name)
+    gct = str(locations.gtex_interim / rna_name)
     exp_name = rna_name.replace(".gct", "_expressions.tsv")
-    exp_path = gtex_interim / exp_name
+    exp_path = locations.gtex_interim / exp_name
     if skip_if_exist and exp_path.exists():
         print("skipping transposing")
     else:
@@ -106,10 +102,10 @@ def transpose_gtex_bulk(rna_name: str, skip_if_exist: bool = True):
 def download_gtex_sample(skip_if_exist: bool = True):
     print("downloading gtex samples info")
     sample_url = "https://storage.googleapis.com/gtex_analysis_v8/annotations/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt"
-    sample_file = gtex_input / "GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt"
+    sample_file = locations.gtex_input / "GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt"
     urllib.request.urlretrieve(sample_url, sample_file)
     phenotypes_url = "https://storage.googleapis.com/gtex_analysis_v8/annotations/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"
-    phenotypes_file = gtex_input / "GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"
+    phenotypes_file = locations.gtex_input / "GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"
     urllib.request.urlretrieve(phenotypes_url, phenotypes_file)
 
 
@@ -133,14 +129,14 @@ def download():
 #    pl.col("my_column").where()
 
 def with_subjects(exp: pl.DataFrame):
-    samples_with_subjects_path = gtex_interim / "samples_with_subjects.parquet"
+    samples_with_subjects_path = locations.gtex_interim / "samples_with_subjects.parquet"
     samples_with_subjects = pl.read_parquet(samples_with_subjects_path)
     return samples_with_subjects.join(exp, left_on="SAMPID", right_on="Ensembl")
 
 @app.command()
 def prepare_bulk():
-    sample_file = gtex_input / "GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt"
-    phenotypes_file = gtex_input / "GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"
+    sample_file = locations.gtex_input / "GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt"
+    phenotypes_file = locations.gtex_input / "GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"
     samples = pl.read_csv(sample_file, comment_char="#", sep="\t", ignore_errors=True)
     phenotypes = pl.read_csv(phenotypes_file, comment_char="#", sep="\t", ignore_errors=True)
     medium_age = pl.col("AGE").str.split("-").alias("medium_age").apply(lambda s: (int(s[1])+int(s[0]))/2.0)
@@ -149,15 +145,24 @@ def prepare_bulk():
     col_get_subject = col_sample.apply(lambda s: s.split("-")[0]+"-"+s.split("-")[1]).alias("SUBJID")
     samples_with_subjects = phenotypes_extended.join(samples.with_column(col_get_subject), left_on="SUBJID", right_on="SUBJID")
     #saving results
-    samples_with_subjects_path = gtex_interim / "samples_with_subjects.parquet"
+    samples_with_subjects_path = locations.gtex_interim / "samples_with_subjects.parquet"
     samples_with_subjects.write_parquet(samples_with_subjects_path)
     print(f"files saved to {samples_with_subjects_path}")
-    exp_path = gtex_interim / "GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable_expressions.tsv"
+    exp_path = locations.gtex_interim / "GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable_expressions.tsv"
     print(f"loading expressions from {exp_path}")
     expressions = pl.read_csv(str(exp_path), comment_char="#", sep="\t", ignore_errors=True)
     expressions_extended = with_subjects(expressions)
-    expressions_extended.write_parquet(gtex_interim / "expressions_extended.parquet")
+    expressions_extended.write_parquet(locations.gtex_interim / "expressions_extended.parquet")
 
+
+@app.command()
+def tune():
+    print("TUNE!")
+
+
+@app.command()
+def train():
+    train_gtex(locations)
 
 if __name__ == '__main__':
     app()

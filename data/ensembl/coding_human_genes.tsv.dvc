@@ -1,0 +1,4 @@
+outs:
+- md5: 2d6ea08df806e1c379b5e81d086dbdbc
+  size: 2059490
+  path: coding_human_genes.tsv

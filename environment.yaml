@@ -16,6 +16,8 @@ dependencies:
   - dvc
   - dvc-gdrive
   - shap
+  - mlflow
+  -
   - pip
   - pip:
       - pycomfort

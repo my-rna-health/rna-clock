@@ -10,7 +10,7 @@ import pandas as pd
 import shap
 from lightgbm import Booster
 
-from rna_clock import parameters
+from rna_clock import config
 from rna_clock.metrics import *
 
 
@@ -33,7 +33,7 @@ def train_lightgbm_model(X_train, X_test, y_train, y_test,
     :return:
     '''
     if params is None:
-        params = parameters.gtex
+        params = config.gtex_parameters
     cat = categorical if (categorical is not None) and len(categorical) > 0 else "auto"
     lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=cat)
     lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
