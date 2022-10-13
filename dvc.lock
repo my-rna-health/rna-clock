@@ -17,7 +17,7 @@ stages:
       md5: 5c0b2bf69218ef69ad13662a700da3e1
       size: 5128257
   download:
-    cmd: python clock.py download
+    cmd: python gtex.py download
     outs:
     - path: data/gtex/input/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad
       md5: 6cdacd7628d5f74e0beaa55f148ecb79
@@ -25,9 +25,17 @@ stages:
     - path: data/gtex/input/GTEx_8_tissues_snRNAseq_immune_atlas_071421.public_obs.h5ad
       md5: 724f876e6fb9d6827c93378980f57148
       size: 128359108
-    - path: data/gtex/interim/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable.gct
-      md5: 2bf2c93c459175b4b1288fc31ab3ce96
-      size: 5186959891
+    - path: data/gtex/input/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable.gct
+      md5: 28e07358435f544d7335e43123c2fdd5
+      size: 5188527799
+    - path: data/gtex/input/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt
+      md5: 3a863b00db00a0a08a5c7900d44ea119
+      size: 11512258
+    - path: data/gtex/input/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt
+      md5: 90297fc31512902f4459c757180fe575
+      size: 20271
     - path: data/gtex/interim/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable_expressions.tsv
-      md5: bfad8fafcf7150a962ac93f144f1b5f8
-      size: 5186959891
+      md5: 3e9375f930b66d0e1374b50574ff3a25
+      size: 5188527799
+  train_gtex:
+    cmd: python gtex.py train

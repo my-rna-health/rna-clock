@@ -9,7 +9,7 @@ from pycomfort.files import *
 from rna_clock.train import train_gtex
 from rna_clock.config import Locations
 
-locations = Locations(Path("."))
+locations = Locations(Path("..") if Path(".").name == "rna_clock" else Path("."))
 
 proxy_handler = urllib.request.ProxyHandler({})
 opener = urllib.request.build_opener(proxy_handler)
@@ -52,12 +52,12 @@ def download_gtex_single_cell(skit_if_exist: bool = True):
 
 
 def stabilize_rna(path: Path) -> pl.DataFrame:
-    rnas = pl.read_csv(path, comment_char="#", sep="\t")
-    stable_gene = pl.col("Name").str.split(".").alias("Ensembl").apply(lambda s: s[0]).unique()
+    print("preparing stable ids for RNA")
+    stable_gene = pl.col("Name").str.split(".").alias("Ensembl").apply(lambda s: s[0])
+    rnas = pl.read_csv(path , comment_char="#", sep="\t", skip_rows=2)
     return rnas.select([
-        stable_gene,
-        pl.all()
-    ]).drop(["Name", "Description"])
+        stable_gene, pl.all()
+    ]).drop(["Name", "Description"]).groupby(pl.col("Ensembl")).agg(pl.all().sum())
 
 
 def download_gtex_tpms(skip_if_exist: bool = True):
@@ -69,23 +69,25 @@ def download_gtex_tpms(skip_if_exist: bool = True):
     if skip_if_exist and stable_rna_file.exists():
         print("file exists, skipping")
     else:
-        urllib.request.urlretrieve(url, rna_file_gz)
+        if not rna_file_gz.exists():
+            urllib.request.urlretrieve(url, rna_file_gz)
         un_gzip(rna_file_gz)
         rna_file_gz.unlink(missing_ok=True)
-        with open(rna_file, 'r+') as fp:
-            lines = fp.readlines()
-            fp.seek(0)
-            fp.truncate()
-            fp.writelines(lines[2:])
-            stable_rnas = stabilize_rna(rna_file)
-            stable_rnas.write_csv(str(stable_rna_file), sep="\t")
-            rna_file.unlink(missing_ok=True)
-            print(f"produced stable rna file at {str(stable_rna_file)}")
-            transpose_gtex_bulk(stable_rna_file.name, skip_if_exist)
+        #with open(rna_file, 'r+') as fp:
+        #    lines = fp.readlines()
+        #    fp.seek(0)
+        #    fp.truncate()
+        #    fp.writelines(lines[2:])
+        stable_rnas = stabilize_rna(rna_file)
+        stable_rnas.write_csv(str(stable_rna_file), sep="\t")
+        rna_file.unlink(missing_ok=True)
+        print(f"produced stable rna file at {str(stable_rna_file)}")
+        transpose_gtex_bulk(stable_rna_file.name, skip_if_exist)
 
 
 def transpose_gtex_bulk(rna_name: str, skip_if_exist: bool = True):
-    gct = str(locations.gtex_interim / rna_name)
+    print("transposing bulk gtex data")
+    gct = str(locations.gtex_input / rna_name)
     exp_name = rna_name.replace(".gct", "_expressions.tsv")
     exp_path = locations.gtex_interim / exp_name
     if skip_if_exist and exp_path.exists():
@@ -97,6 +99,7 @@ def transpose_gtex_bulk(rna_name: str, skip_if_exist: bool = True):
         print(f"command to run: {comm}")
         transpose = subprocess.run(comm, shell=True)
         print("The exit code was: %d" % transpose.returncode)
+        print(f"transpose of {exp_path.absolute().resolve()}")
 
 
 def download_gtex_sample(skip_if_exist: bool = True):
