@@ -39,3 +39,17 @@ stages:
       size: 5188527799
   train_gtex:
     cmd: python gtex.py train
+    deps:
+    - path: data/gtex/interim/expressions_extended.parquet
+      md5: 9bd80e5c458075eedeaf8186c46dd64d
+      size: 3060639498
+    outs:
+    - path: data/gtex/output/all/gtex_metrics_best_huber.json
+      md5: 37ae7f6a76efc6048fcdbebed254fe42
+      size: 80
+    - path: data/gtex/output/all/gtex_metrics_best_mse.json
+      md5: 37ae7f6a76efc6048fcdbebed254fe42
+      size: 80
+    - path: data/gtex/output/all/gtex_metrics_plot.json
+      md5: d0949063c62eabc73aac6b4c3d882017
+      size: 20548
