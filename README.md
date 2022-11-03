@@ -1,4 +1,4 @@
- rna-clock
+j rna-clock
 Repository to experiment with various transcriptomic clocks
 
 #

@@ -1,15 +1,6 @@
-import polars as pl
-from pathlib import Path
-from pycomfort.files import *
-from pycomfort import files
-import pyarrow
-import pandas as pd
-from functional import seq
-from typing import *
-from rna_clock.splits import *
-from rna_clock import *
-from rna_clock.trees import *
 from rna_clock.config import Locations
+from rna_clock.splits import *
+from rna_clock.trees import *
 
 
 def split_and_train(expressions: pl.DataFrame, for_selection: list[str]) -> [Booster, list[BasicMetrics]]:
@@ -18,7 +9,7 @@ def split_and_train(expressions: pl.DataFrame, for_selection: list[str]) -> [Boo
     print(f"train [{train.shape}], dev [{dev.shape}], test [{test.shape}]")
     (train_X, train_Y) = to_XY(train)
     (dev_X, dev_Y) = to_XY(train)
-    return train_lightgbm_model(train_X, dev_X, train_Y, dev_Y)
+    return train_lightgbm_model(train_X, dev_X, train_Y, dev_Y, validation_name="development")
 
 
 def train_group(expressions: pl.DataFrame, for_selection: list[str], group: str, locations: Locations):

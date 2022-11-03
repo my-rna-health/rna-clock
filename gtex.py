@@ -8,6 +8,7 @@ from pycomfort.files import *
 
 from rna_clock.train import train_gtex
 from rna_clock.config import Locations
+from tune import tune_gtex
 
 locations = Locations(Path("..") if Path(".").name == "rna_clock" else Path("."))
 
@@ -160,7 +161,7 @@ def prepare_bulk():
 
 @app.command()
 def tune():
-    print("TUNE!")
+    tune_gtex(locations)
 
 
 @app.command()

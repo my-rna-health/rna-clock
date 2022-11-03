@@ -1,18 +1,13 @@
 import lightgbm as lgb
 import numpy
 import polars as pl
-from dataclasses import dataclass
-from typing import *
 from functional import seq
-import lightgbm as lgb
-import numpy as np
-import pandas as pd
-import shap
 from lightgbm import Booster
 
 from rna_clock import config
 from rna_clock.metrics import *
 
+Evaluation = Dict[str, Dict[str, List[Any]]]
 
 def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age") -> tuple[numpy.ndarray, numpy.ndarray]:
     gene_columns = seq(expressions.columns).filter(lambda s: "ENSG" in s).to_list()
@@ -21,7 +16,7 @@ def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age") -> tuple[nu
 
 def train_lightgbm_model(X_train, X_test, y_train, y_test,
                          params: Dict = None, categorical=None,
-                     num_boost_round: int = 250, seed: int = 0, early_stopping_rounds = 5) -> [Booster, list[BasicMetrics]]:
+                     num_boost_round: int = 250, seed: int = 0, early_stopping_rounds = 5, validation_name: str = "validation") -> [Booster, Evaluation]:
     '''
     trains a regression model
     :param X_train:
@@ -37,16 +32,17 @@ def train_lightgbm_model(X_train, X_test, y_train, y_test,
     cat = categorical if (categorical is not None) and len(categorical) > 0 else "auto"
     lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=cat)
     lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
-    evals_result = {}
+
+    eval_result: Evaluation = dict()
     stopping_callback = lgb.early_stopping(early_stopping_rounds)
-    log_eval_callback = lgb.log_evaluation(num_boost_round)
+    record_evaluation_callback = lgb.record_evaluation(eval_result)
     if seed is not None:
         params["seed"] = seed
-    gbm = lgb.train(params,
+    booster = lgb.train(params,
                     lgb_train,
                     num_boost_round=num_boost_round,
                     valid_sets=[lgb_eval],
-                    evals_result=evals_result,
-                    callbacks=[stopping_callback, log_eval_callback]
+                    valid_names=[validation_name],
+                    callbacks=[stopping_callback, record_evaluation_callback]
                     )
-    return gbm, BasicMetrics.parse_eval(evals_result)
+    return booster, BasicMetrics.parse_eval(eval_result[validation_name])

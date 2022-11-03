@@ -24,4 +24,11 @@ stages:
       - data/gtex/output/all/gtex_metrics_best_huber.json
       - data/gtex/output/all/gtex_metrics_best_mse.json
     plots:
-      - data/gtex/output/all/gtex_metrics_plot.json
+      data/gtex/output/all/gtex_metrics_plot.json:
+        y:
+          - huber
+          - MSE
+          - MAE
+        x_label: steps
+        y_label: years
+        title: "aging clock trained on all samples"
