@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import ssl
 import urllib
 import urllib.request
 
@@ -8,7 +9,7 @@ from pycomfort.files import *
 
 from rna_clock.train import train_gtex
 from rna_clock.config import Locations
-from tune import tune_gtex
+from rna_clock.tune import tune_gtex
 
 locations = Locations(Path("..") if Path(".").name == "rna_clock" else Path("."))
 
@@ -16,7 +17,12 @@ proxy_handler = urllib.request.ProxyHandler({})
 opener = urllib.request.build_opener(proxy_handler)
 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 urllib.request.install_opener(opener)
-
+try:
+    ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 @click.group()
 def app():
@@ -60,6 +66,20 @@ def stabilize_rna(path: Path) -> pl.DataFrame:
         stable_gene, pl.all()
     ]).drop(["Name", "Description"]).groupby(pl.col("Ensembl")).agg(pl.all().sum())
 
+
+def download_cattle_counts(skip_if_exist: bool = True):
+    url = "https://cgtex.roslin.ed.ac.uk/wp-content/plugins/cgtex/static/rawdata/Gene_read_counts_FarmGTEx_cattle_V0.txt.txt.gz"
+    counts_name = "Gene_read_counts_FarmGTEx_cattle_V0.tsv"
+    counts_file_gz = locations.cattle_input / (counts_name + ".gz")
+    counts_file = locations.cattle_input / counts_name
+    if skip_if_exist and counts_file.exists():
+        print("file exists, skipping")
+    else:
+        if not counts_file_gz.exists():
+            urllib.request.urlretrieve(url, counts_file_gz)
+            un_gzip(counts_file_gz)
+            counts_file_gz.unlink(missing_ok=True)
+            print("cattle download finished")
 
 def download_gtex_tpms(skip_if_exist: bool = True):
     url = "https://storage.googleapis.com/gtex_analysis_v8/rna_seq_data/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct.gz"
@@ -158,6 +178,9 @@ def prepare_bulk():
     expressions_extended = with_subjects(expressions)
     expressions_extended.write_parquet(locations.gtex_interim / "expressions_extended.parquet")
 
+@app.command()
+def prepare_cattle_bulk():
+    download_cattle_counts()
 
 @app.command()
 def tune():

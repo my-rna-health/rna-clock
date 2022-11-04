@@ -16,9 +16,15 @@ class Locations:
     base: Path
     data: Path
     gtex: Path
+
     gtex_input: Path
     gtex_interim: Path
     gtex_output: Path
+
+    cattle: Path
+    cattle_input: Path
+    cattle_output: Path
+
     ensembl: Path
     coding_human_genes: Path
 
@@ -33,6 +39,10 @@ class Locations:
 
         self.gtex_interim = self.gtex / "interim"
         self.gtex_interim.mkdir(parents=True, exist_ok=True)
+        self.cattle = self.data / "cattle"
+        self.cattle_input = self.cattle / "input"
+        self.cattle_interim = self.cattle / "interim"
+        self.cattle_output = self.cattle / "output"
 
         self.gtex_output = self.gtex / "output"
         self.ensembl = self.data / "ensembl"

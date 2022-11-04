@@ -6,8 +6,7 @@ from rna_clock.trees import *
 import optuna
 
 
-
-def tune(X_train, X_test, y_train, y_test,
+def tune_lightgbm_model(X_train, X_test, y_train, y_test,
          params: Dict = None, categorical=None,
          num_boost_round: int = 250, seed: int = 0, early_stopping_rounds = 5, validation_name: str = "validation"):
     time_budget_seconds = 3600
@@ -45,13 +44,14 @@ def split_and_tune(expressions: pl.DataFrame, for_selection: list[str]) -> [Boos
     print(f"train [{train.shape}], dev [{dev.shape}], test [{test.shape}]")
     (train_X, train_Y) = to_XY(train)
     (dev_X, dev_Y) = to_XY(train)
-    return train_lightgbm_model(train_X, dev_X, train_Y, dev_Y, validation_name="development")
+    return tune_lightgbm_model(train_X, dev_X, train_Y, dev_Y, validation_name="development")
+
 
 def tune_group(expressions: pl.DataFrame, for_selection: list[str], group: str, locations: Locations):
     print("writing best tuned params")
     best_params, best_value = split_and_tune(expressions, for_selection)
     print("BEST PARAMS", best_params)
-    print("BEST VALUE =",best_value)
+    print("BEST VALUE =", best_value)
     group_output = locations.gtex_output / group
     group_output.mkdir(exist_ok=True)
     par_output = (group_output / "params.json")
@@ -61,7 +61,7 @@ def tune_group(expressions: pl.DataFrame, for_selection: list[str], group: str, 
     print("TUNED!")
 
 def tune_gtex(locations: Locations):
-    print("train_gtex, prediction of medium age")
+    print("tune_gtex, tuning best predictions for medium age")
     coding_genes = pl.read_csv(locations.coding_human_genes, sep="\t")
     coding_gene_ids = coding_genes.select(pl.col("Gene stable ID")).to_dict(False)['Gene stable ID']
     expressions = pl.read_parquet(locations.gtex_interim / "expressions_extended.parquet")

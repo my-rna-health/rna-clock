@@ -51,5 +51,11 @@ stages:
       md5: 37ae7f6a76efc6048fcdbebed254fe42
       size: 80
     - path: data/gtex/output/all/gtex_metrics_plot.json
-      md5: d0949063c62eabc73aac6b4c3d882017
-      size: 20548
+      md5: 41e39c39cb1de4b99f1c2188ebbc628d
+      size: 14362
+  prepare_cattle:
+    cmd: python gtex.py  prepare-cattle-bulk
+    outs:
+    - path: data/cattle/input/Gene_read_counts_FarmGTEx_cattle_V0.tsv
+      md5: 6ac61cdb28173cde2211db48e7808918
+      size: 649836736

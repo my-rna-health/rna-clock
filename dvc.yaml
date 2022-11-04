@@ -8,6 +8,10 @@ stages:
       - data/gtex/input/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm_stable.gct
       - data/gtex/input/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt
       - data/gtex/input/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt
+  prepare_cattle:
+    cmd: python gtex.py  prepare-cattle-bulk
+    outs:
+      - data/cattle/input/Gene_read_counts_FarmGTEx_cattle_V0.tsv
   prepare_bulk:
     deps:
       - data/gtex/input/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt
@@ -24,11 +28,8 @@ stages:
       - data/gtex/output/all/gtex_metrics_best_huber.json
       - data/gtex/output/all/gtex_metrics_best_mse.json
     plots:
-      data/gtex/output/all/gtex_metrics_plot.json:
-        y:
-          - huber
-          - MSE
-          - MAE
-        x_label: steps
-        y_label: years
-        title: "aging clock trained on all samples"
+      - data/gtex/output/all/gtex_metrics_plot.json:
+          y: "MAE"
+          x_label: steps
+          y_label: years
+          title: "aging clock trained on all samples"
