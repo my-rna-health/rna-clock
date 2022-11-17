@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import *
 from functional import seq
 
-from preprocess import ensembl_gene_col
+from rna_clock.preprocess import ensembl_gene_col
 
 
 def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age") -> tuple[numpy.ndarray, numpy.ndarray]:

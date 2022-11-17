@@ -9,7 +9,7 @@ import optuna
 def tune_lightgbm_model(X_train, X_test, y_train, y_test,
          params: Dict = None, categorical=None,
          num_boost_round: int = 1000, seed: int = 0, early_stopping_rounds = 50, validation_name: str = "validation"):
-    time_budget_seconds = 8000
+    time_budget_seconds = 12000
     if params is None:  params = config.gtex_parameters
     cat = categorical if (categorical is not None) and len(categorical) > 0 else "auto"
     lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=cat)
@@ -29,12 +29,12 @@ def tune_lightgbm_model(X_train, X_test, y_train, y_test,
         early_stopping_rounds=early_stopping_rounds,
         callbacks=[stopping_callback, record_evaluation_callback]
     )
-    tuner.tune_bagging()
-    tuner.tune_feature_fraction()
-    tuner.tune_num_leaves()
-    tuner.tune_regularization_factors()
+    tuner.tune_bagging(20)
+    tuner.tune_feature_fraction(14)
+    tuner.tune_num_leaves(40)
+    tuner.tune_regularization_factors(40)
     tuner.tune_min_data_in_leaf()
-    tuner.tune_feature_fraction_stage2()
+    tuner.tune_feature_fraction_stage2(12)
     tuner.run()
     best_params: Dict[str, Any] = tuner.best_params
     best_value = tuner.best_score
