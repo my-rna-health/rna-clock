@@ -68,8 +68,10 @@ def stabilize_rna(path: Path) -> pl.DataFrame:
 
 
 def download_cattle_counts(skip_if_exist: bool = True):
-    url = "https://cgtex.roslin.ed.ac.uk/wp-content/plugins/cgtex/static/rawdata/Gene_read_counts_FarmGTEx_cattle_V0.txt.txt.gz"
-    counts_name = "Gene_read_counts_FarmGTEx_cattle_V0.tsv"
+    #url = "https://cgtex.roslin.ed.ac.uk/wp-content/plugins/cgtex/static/rawdata/Gene_read_counts_FarmGTEx_cattle_V0.txt.txt.gz"
+    url = "/home/antonkulaga/Downloads/TPM.8742samples_27607genes.zip"
+    #counts_name = "Gene_read_counts_FarmGTEx_cattle_V0.tsv"
+    count_name = "TPM.8742samples_27607genes.zip"
     counts_file_gz = locations.cattle_input / (counts_name + ".gz")
     counts_file = locations.cattle_input / counts_name
     if skip_if_exist and counts_file.exists():

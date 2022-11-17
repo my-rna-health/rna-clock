@@ -24,6 +24,7 @@ class Locations:
     cattle: Path
     cattle_input: Path
     cattle_output: Path
+    cattle_expressions: Path
 
     ensembl: Path
     coding_human_genes: Path
@@ -47,23 +48,28 @@ class Locations:
         self.gtex_output = self.gtex / "output"
         self.ensembl = self.data / "ensembl"
         self.coding_human_genes = self.ensembl / "coding_human_genes.tsv"
+        self.cattle_expressions = self.cattle_input / "TPM.8742samples_27607genes.tsv"
 
 
 from enum import Enum
 from typing import Dict
 
 gtex_parameters: Dict = dict(
-    {"objective": "regression",
+    {'objective': 'regression',
      'boosting_type': 'gbdt',
      'lambda_l1': 2.649670285109348,
      'lambda_l2': 3.651743005278647,
      'max_leaves': 21,
      'max_depth': 3,
-     'feature_fraction': 0.7381836300988616,
-     'bagging_fraction': 0.5287709904685758,
+     'feature_fraction': 1.0,
+     'bagging_fraction': 0.83967041727391,
      'learning_rate': 0.054438364299744225,
      'min_data_in_leaf': 7,
      'drop_rate': 0.13171689004108006,
      'metric': ['mae', 'mse', 'huber'],
+     'feature_pre_filter': False,
+     'num_leaves': 31,
+     'bagging_freq': 5,
+     'min_child_samples': 50
      }
-)
+) #. Best is trial 25 with value: 5.93964904752488.

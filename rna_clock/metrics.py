@@ -41,5 +41,5 @@ class BasicMetrics:
 
     @staticmethod
     def parse_eval(evals_result: Dict):
-        dic = list(evals_result.values())[0]
-        return [BasicMetrics.from_light_dict_row(dic, i) for i in range(0, len(dic["l1"]))]
+        length = len(list(evals_result.values())[0])
+        return [BasicMetrics.from_light_dict_row(evals_result, i) for i in range(0, length)]

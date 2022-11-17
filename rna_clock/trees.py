@@ -6,11 +6,14 @@ from lightgbm import Booster
 
 from rna_clock import config
 from rna_clock.metrics import *
+from rna_clock.preprocess import extract_ensembl_columns
 
 Evaluation = Dict[str, Dict[str, List[Any]]]
 
-def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age") -> tuple[numpy.ndarray, numpy.ndarray]:
-    gene_columns = seq(expressions.columns).filter(lambda s: "ENSG" in s).to_list()
+def to_XY(expressions: pl.DataFrame, to_predict: str = "medium_age",
+          extraction: Callable[[pl.DataFrame],
+          list[str]] = extract_ensembl_columns) -> tuple[numpy.ndarray, numpy.ndarray]:
+    gene_columns = extraction(expressions)
     return expressions.select(gene_columns).to_numpy(), expressions.select(to_predict).to_numpy()
 
 

@@ -8,8 +8,8 @@ import optuna
 
 def tune_lightgbm_model(X_train, X_test, y_train, y_test,
          params: Dict = None, categorical=None,
-         num_boost_round: int = 250, seed: int = 0, early_stopping_rounds = 5, validation_name: str = "validation"):
-    time_budget_seconds = 3600
+         num_boost_round: int = 1000, seed: int = 0, early_stopping_rounds = 50, validation_name: str = "validation"):
+    time_budget_seconds = 8000
     if params is None:  params = config.gtex_parameters
     cat = categorical if (categorical is not None) and len(categorical) > 0 else "auto"
     lgb_train = lgb.Dataset(X_train, y_train, categorical_feature=cat)
@@ -22,7 +22,7 @@ def tune_lightgbm_model(X_train, X_test, y_train, y_test,
         params["seed"] = seed
     tuner = optuna.integration.lightgbm.LightGBMTuner(
         params, lgb_train,
-        valid_sets = [lgb_eval],
+        valid_sets=[lgb_eval],
         num_boost_round=num_boost_round,
         verbose_eval=num_boost_round,
         time_budget= time_budget_seconds,
@@ -31,12 +31,15 @@ def tune_lightgbm_model(X_train, X_test, y_train, y_test,
     )
     tuner.tune_bagging()
     tuner.tune_feature_fraction()
+    tuner.tune_num_leaves()
+    tuner.tune_regularization_factors()
     tuner.tune_min_data_in_leaf()
     tuner.tune_feature_fraction_stage2()
     tuner.run()
     best_params: Dict[str, Any] = tuner.best_params
     best_value = tuner.best_score
     return best_params, best_value
+
 
 def split_and_tune(expressions: pl.DataFrame, for_selection: list[str]) -> [Booster, list[BasicMetrics]]:
     df = expressions.select(for_selection)
@@ -59,6 +62,8 @@ def tune_group(expressions: pl.DataFrame, for_selection: list[str], group: str, 
     with par_output.open("w") as outfile:
         json.dump(best_params, outfile)
     print("TUNED!")
+    return best_value, best_params
+
 
 def tune_gtex(locations: Locations):
     print("tune_gtex, tuning best predictions for medium age")
@@ -69,4 +74,4 @@ def tune_gtex(locations: Locations):
     coding_gene_columns = sorted(set(coding_gene_ids) & set(gene_columns), key = coding_gene_ids.index)
     to_predict: str = "medium_age"
     for_selection = coding_gene_columns + [to_predict]
-    tune_group(expressions, for_selection, "all", locations)
+    return tune_group(expressions, for_selection, "all", locations)
