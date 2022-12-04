@@ -6,7 +6,6 @@ from polars import DataType
 
 ensembl_gene_col = pl.col("^ENSG[a-zA-Z0-9]+$")
 
-
 def extract_ensembl_columns(expressions: pl.DataFrame) -> list[str]:
     gene_columns = seq(expressions.columns).filter(lambda s: "ENSG" in s).to_list()
     return gene_columns

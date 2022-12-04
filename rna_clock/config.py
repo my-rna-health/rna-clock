@@ -11,7 +11,6 @@ from rna_clock import *
 from rna_clock.trees import *
 import sys
 
-
 class Locations:
     base: Path
     data: Path
@@ -62,14 +61,31 @@ gtex_parameters: Dict = dict(
      'max_leaves': 21,
      'max_depth': 3,
      'feature_fraction': 1.0,
-     'bagging_fraction': 0.83967041727391,
+     'bagging_fraction': 0.668691435992287,
      'learning_rate': 0.054438364299744225,
      'min_data_in_leaf': 7,
      'drop_rate': 0.13171689004108006,
      'metric': ['mae', 'mse', 'huber'],
      'feature_pre_filter': False,
-     'num_leaves': 31,
-     'bagging_freq': 5,
+     'num_leaves': 8,
+     'bagging_freq': 1,
      'min_child_samples': 50
      }
-) #. Best is trial 25 with value: 5.93964904752488.
+) #BEST VALUE = 3.654487322438442
+"""
+BEST PARAMS {'objective': 'regression', 
+'boosting_type': 'gbdt', 
+'lambda_l1': 2.649670285109348, 
+'lambda_l2': 3.651743005278647, 
+'max_leaves': 21, 'max_depth': 3, 'feature_fraction': 1.0, 
+'bagging_fraction': 0.668691435992287, 
+'learning_rate': 0.054438364299744225, 
+'min_data_in_leaf': 7, 
+'drop_rate': 0.13171689004108006, 
+'metric': ['mae', 'mse', 'huber'], 
+'feature_pre_filter': False, 
+'num_leaves': 8, 
+'bagging_freq': 1, 'min_child_samples': 50, 'seed': 0}
+BEST VALUE = 3.654487322438442
+TUNED!
+"""

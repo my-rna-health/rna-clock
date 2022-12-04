@@ -18,8 +18,12 @@ dependencies:
   - shap
   - mlflow
   - optuna
+  - flaml
   - pip
   - pip:
       - pycomfort
       - polars
       - lassonet
+      - flaml[notebook]
+      - flaml[catboost]
+      - flaml[nni]

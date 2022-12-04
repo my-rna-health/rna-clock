@@ -83,6 +83,7 @@ def download_cattle_counts(skip_if_exist: bool = True):
             counts_file_gz.unlink(missing_ok=True)
             print("cattle download finished")
 
+
 def download_gtex_tpms(skip_if_exist: bool = True):
     url = "https://storage.googleapis.com/gtex_analysis_v8/rna_seq_data/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct.gz"
     rna_name = "GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_tpm.gct"
